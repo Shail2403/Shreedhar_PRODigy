@@ -103,11 +103,10 @@ DATABASES = {
         'NAME': 'postgres',
         'USER': 'postgres.sqgghadcjrpfwttyfegi',
         'PASSWORD': 'adminsepass@PP8',
-        'HOST': 'aws-0-ap-northeast-1.pooler.supabase.com',
+        'HOST': 'aws-0-ap-southeast-1.pooler.supabase.com',
         'PORT': '6543',
         'OPTIONS': {
             'sslmode': 'require',
-            'options': '-c endpoint=sqgghadcjrpfwttyfegi'
         },
         'CONN_MAX_AGE': 0,
     }
