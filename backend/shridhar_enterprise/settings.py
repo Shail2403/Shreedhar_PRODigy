@@ -33,7 +33,6 @@ DJANGO_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.gis',
 ]
 
 THIRD_PARTY_APPS = [
@@ -102,13 +101,9 @@ DATABASES = {
     )
 }
 
-# Add PostGIS options if using PostgreSQL
-if DATABASES['default']['ENGINE'] == 'django.contrib.gis.db.backends.postgis' or 'postgresql' in DATABASES['default']['ENGINE']:
-    DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
-    DATABASES['default']['OPTIONS'] = DATABASES['default'].get('OPTIONS', {})
-    DATABASES['default']['OPTIONS'].update({
-        'options': '-c search_path=public,gis,extensions'
-    })
+# Use standard PostgreSQL engine (works with Supabase and avoids Render GIS crashes)
+if 'postgresql' in DATABASES['default']['ENGINE'] or 'postgis' in DATABASES['default']['ENGINE']:
+    DATABASES['default']['ENGINE'] = 'django.db.backends.postgresql'
 
 # ---------------------------------------------------------------------------
 # Django REST Framework
