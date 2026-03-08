@@ -95,24 +95,40 @@ WSGI_APPLICATION = 'shridhar_enterprise.wsgi.application'
 AUTH_USER_MODEL = 'users.CustomUser'
 
 # Robust Database Configuration for Supabase Pooler
-# Priority: Individual Env Vars > DATABASE_URL > Default
 database_url = os.getenv('DATABASE_URL')
-url = urllib.parse.urlparse(database_url) if database_url else None
+if database_url:
+    # Use manual parsing for max control
+    url = urllib.parse.urlparse(database_url)
+    db_user = url.username or os.getenv('DB_USER', 'postgres.sqgghadcjrpfwttyfegi')
+    db_password = urllib.parse.unquote(url.password) if url.password else os.getenv('DB_PASSWORD', 'adminsepass@PP8')
+    db_host = url.hostname or os.getenv('DB_HOST', 'aws-0-ap-southeast-1.pooler.supabase.com')
+    db_port = url.port or os.getenv('DB_PORT', 6543)
+    db_name = url.path[1:] or os.getenv('DB_NAME', 'postgres')
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME') or (url.path[1:] if url else 'postgres'),
-        'USER': os.getenv('DB_USER') or (url.username if url else 'postgres'),
-        'PASSWORD': os.getenv('DB_PASSWORD') or (urllib.parse.unquote(url.password) if url and url.password else 'adminsepass@PP8'),
-        'HOST': os.getenv('DB_HOST') or (url.hostname if url else 'aws-0-ap-southeast-1.pooler.supabase.com'),
-        'PORT': int(os.getenv('DB_PORT') or (url.port if url else 5432)),
-        'OPTIONS': {
-            'sslmode': 'require',
-        },
-        'CONN_MAX_AGE': 0,
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': db_name,
+            'USER': db_user,
+            'PASSWORD': db_password,
+            'HOST': db_host,
+            'PORT': db_port,
+            'OPTIONS': {
+                'sslmode': 'require',
+                # This 'options' part is the "Secret Sauce" for Supabase Poolers
+                'options': f"-c endpoint=sqgghadcjrpfwttyfegi"
+            },
+            'CONN_MAX_AGE': 0,
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+            conn_max_age=0,
+            conn_health_checks=True,
+        )
+    }
 
 # Force the standard PostgreSQL engine to avoid OS-level GIS library errors on Render
 if 'postgresql' in DATABASES['default'].get('ENGINE', '') or 'postgis' in DATABASES['default'].get('ENGINE', ''):
