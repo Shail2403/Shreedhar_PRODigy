@@ -10,6 +10,10 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.http import HttpResponse
+
+def health_check(request):
+    return HttpResponse("<h2>🚀 Shridhar Enterprise Backend is LIVE!</h2>", content_type="text/html")
 
 # ── Admin customization ───────────────────────────────────────────────────────
 admin.site.site_header = "Shridhar Enterprise Administration"
@@ -25,6 +29,7 @@ urlpatterns = [
     path('api/products/', include('products.urls')),
     path('api/cart/', include('cart.urls')),
     path('api/orders/', include('orders.urls')),
+    path('', health_check), # Root success message
 ]
 
 # Serve static and media files in development
