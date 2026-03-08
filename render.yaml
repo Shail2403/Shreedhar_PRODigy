@@ -1,0 +1,41 @@
+services:
+  # Backend
+  - type: web
+    name: shridhar-backend
+    runtime: python
+    buildCommand: "./backend_build.sh"
+    startCommand: "cd backend && gunicorn shridhar_enterprise.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: DJANGO_SETTINGS_MODULE
+        value: shridhar_enterprise.settings
+      - key: SECRET_KEY
+        fromContext: secret
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: "*"
+      # Supabase DB
+      - key: DB_ENGINE
+        value: django.contrib.gis.db.backends.postgis
+      - key: DB_NAME
+        value: postgres
+      - key: DB_USER
+        value: postgres
+      - key: DB_PASSWORD
+        fromContext: secret
+      - key: DB_HOST
+        value: db.sqgghadcjrpfwttyfegi.supabase.co
+      - key: DB_PORT
+        value: "5432"
+
+  # Frontend
+  - type: static
+    name: shridhar-frontend
+    runtime: node
+    buildCommand: "cd frontend && npm install && npm run build"
+    publishPath: "frontend/dist"
+    envVars:
+      - key: VITE_API_URL
+        value: https://shridhar-backend.onrender.com

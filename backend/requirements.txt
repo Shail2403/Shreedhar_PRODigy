@@ -26,3 +26,6 @@ twilio==9.10.2
 typing_extensions==4.15.0
 urllib3==2.6.3
 yarl==1.23.0
+gunicorn==23.0.0
+psycopg2-binary==2.9.10
+whitenoise==6.9.0
