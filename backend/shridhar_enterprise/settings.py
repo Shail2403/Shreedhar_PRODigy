@@ -7,6 +7,7 @@ Secrets are loaded from .env via python-decouple for 12-factor compliance.
 
 import os
 import dj_database_url
+import urllib.parse
 from pathlib import Path
 from datetime import timedelta
 from decouple import config
@@ -93,17 +94,40 @@ WSGI_APPLICATION = 'shridhar_enterprise.wsgi.application'
 # ---------------------------------------------------------------------------
 AUTH_USER_MODEL = 'users.CustomUser'
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-        conn_max_age=0,
-        conn_health_checks=True,
-    )
-}
+# Robust Database Configuration for Supabase Pooler
+database_url = os.getenv('DATABASE_URL')
+if database_url:
+    # Use manual parsing to ensure the project ref and encoded password are handled correctly
+    url = urllib.parse.urlparse(database_url)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': url.path[1:] or os.getenv('DB_NAME', 'postgres'),
+            'USER': url.username or os.getenv('DB_USER'),
+            'PASSWORD': urllib.parse.unquote(url.password) if url.password else os.getenv('DB_PASSWORD'),
+            'HOST': url.hostname or os.getenv('DB_HOST'),
+            'PORT': url.port or os.getenv('DB_PORT', 6543),
+            'OPTIONS': {
+                'sslmode': 'require',
+            },
+            'CONN_MAX_AGE': 0, # Required for Supabase Transaction mode
+        }
+    }
+else:
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+            conn_max_age=0,
+            conn_health_checks=True,
+        )
+    }
 
-# Use standard PostgreSQL engine (works with Supabase and avoids Render GIS crashes)
-if 'postgresql' in DATABASES['default']['ENGINE'] or 'postgis' in DATABASES['default']['ENGINE']:
+# Force the standard PostgreSQL engine to avoid OS-level GIS library errors on Render
+if 'postgresql' in DATABASES['default'].get('ENGINE', '') or 'postgis' in DATABASES['default'].get('ENGINE', ''):
     DATABASES['default']['ENGINE'] = 'django.db.backends.postgresql'
+
+# Debugging (Masked)
+print(f"DEBUG: Connecting to {DATABASES['default'].get('HOST')} as {DATABASES['default'].get('USER')}")
 
 # ---------------------------------------------------------------------------
 # Django REST Framework
