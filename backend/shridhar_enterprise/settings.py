@@ -14,7 +14,7 @@ from decouple import config
 # ---------------------------------------------------------------------------
 # Directory helpers
 # ---------------------------------------------------------------------------
-BASE_DIR = Path(__file__).resolve().parent.parent.parent  # backend/
+BASE_DIR = Path(__file__).resolve().parent.parent  # backend/ root
 
 # ---------------------------------------------------------------------------
 # Security
@@ -73,7 +73,7 @@ ROOT_URLCONF = 'shridhar_enterprise.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'backend' / 'templates'],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -96,7 +96,7 @@ AUTH_USER_MODEL = 'users.CustomUser'
 DATABASES = {
     'default': dj_database_url.config(
         default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-        conn_max_age=600,
+        conn_max_age=0,
         conn_health_checks=True,
     )
 }
@@ -237,3 +237,27 @@ FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:5174')
 # Phone Number Field – default region
 # ---------------------------------------------------------------------------
 PHONENUMBER_DEFAULT_REGION = 'IN'
+
+# ---------------------------------------------------------------------------
+# Logging (Critical for Render Debugging)
+# ---------------------------------------------------------------------------
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            'propagate': False,
+        },
+    },
+}
