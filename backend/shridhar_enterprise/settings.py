@@ -18,9 +18,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent  # backend/
 # ---------------------------------------------------------------------------
 # Security
 # ---------------------------------------------------------------------------
-SECRET_KEY = config('SECRET_KEY')
-DEBUG = config('DEBUG', default=False, cast=bool)
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='').split(',')
+SECRET_KEY = os.getenv('SECRET_KEY', config('SECRET_KEY', default='shridhar-enterprise-super-secret-key-change-in-production-2024!'))
+DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
 
 # ---------------------------------------------------------------------------
 # Application definition
@@ -97,12 +97,12 @@ AUTH_USER_MODEL = 'users.CustomUser'
 # ---------------------------------------------------------------------------
 DATABASES = {
     'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'adminsepass@PP8',
-        'HOST': 'db.sqgghadcjrpfwttyfegi.supabase.co',
-        'PORT': '5432',
+        'ENGINE': os.getenv('DB_ENGINE', 'django.contrib.gis.db.backends.postgis'),
+        'NAME': os.getenv('DB_NAME', 'postgres'),
+        'USER': os.getenv('DB_USER', 'postgres'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'adminsepass@PP8'),
+        'HOST': os.getenv('DB_HOST', 'db.sqgghadcjrpfwttyfegi.supabase.co'),
+        'PORT': os.getenv('DB_PORT', '5432'),
         'OPTIONS': {
             'sslmode': 'require',
             'options': '-c search_path="$user",public,gis,extensions'

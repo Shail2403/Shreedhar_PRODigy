@@ -41,7 +41,6 @@ dist-ssr/
 .eslintcache
 .stylelintcache
 .npm
-.eslintcache
 
 # Env
 .env
