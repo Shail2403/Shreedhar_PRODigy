@@ -6,6 +6,7 @@ Secrets are loaded from .env via python-decouple for 12-factor compliance.
 """
 
 import os
+import dj_database_url
 from pathlib import Path
 from datetime import timedelta
 from decouple import config
@@ -32,6 +33,7 @@ DJANGO_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.gis',
 ]
 
 THIRD_PARTY_APPS = [
@@ -92,22 +94,21 @@ WSGI_APPLICATION = 'shridhar_enterprise.wsgi.application'
 # ---------------------------------------------------------------------------
 AUTH_USER_MODEL = 'users.CustomUser'
 
-# ---------------------------------------------------------------------------
-# Database – overridden in dev/prod settings
-# ---------------------------------------------------------------------------
 DATABASES = {
-    'default': {
-        'ENGINE': os.getenv('DB_ENGINE', 'django.contrib.gis.db.backends.postgis'),
-        'NAME': os.getenv('DB_NAME', 'postgres'),
-        'USER': os.getenv('DB_USER', 'postgres.sqgghadcjrpfwttyfegi'),
-        'PASSWORD': os.getenv('DB_PASSWORD', 'adminsepass@PP8'),
-        'HOST': os.getenv('DB_HOST', 'aws-0-ap-southeast-1.pooler.supabase.com'),
-        'PORT': os.getenv('DB_PORT', '6543'),
-        'OPTIONS': {
-            'sslmode': 'require',
-        },
-    }
+    'default': dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 }
+
+# Add PostGIS options if using PostgreSQL
+if DATABASES['default']['ENGINE'] == 'django.contrib.gis.db.backends.postgis' or 'postgresql' in DATABASES['default']['ENGINE']:
+    DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
+    DATABASES['default']['OPTIONS'] = DATABASES['default'].get('OPTIONS', {})
+    DATABASES['default']['OPTIONS'].update({
+        'options': '-c search_path=public,gis,extensions'
+    })
 
 # ---------------------------------------------------------------------------
 # Django REST Framework
