@@ -94,48 +94,42 @@ WSGI_APPLICATION = 'shridhar_enterprise.wsgi.application'
 # ---------------------------------------------------------------------------
 AUTH_USER_MODEL = 'users.CustomUser'
 
-# Robust Database Configuration for Supabase Pooler
-database_url = os.getenv('DATABASE_URL')
-if database_url:
-    # Use manual parsing for max control
-    url = urllib.parse.urlparse(database_url)
-    db_user = url.username or os.getenv('DB_USER', 'postgres.sqgghadcjrpfwttyfegi')
-    db_password = urllib.parse.unquote(url.password) if url.password else os.getenv('DB_PASSWORD', 'adminsepass@PP8')
-    db_host = url.hostname or os.getenv('DB_HOST', 'aws-0-ap-southeast-1.pooler.supabase.com')
-    db_port = url.port or os.getenv('DB_PORT', 6543)
-    db_name = url.path[1:] or os.getenv('DB_NAME', 'postgres')
+# ---------------------------------------------------------------------------
+# Database Configuration (Production-First for Supabase)
+# ---------------------------------------------------------------------------
+# We use individual variables to avoid URL-encoding errors with passwords containing '@'
+DB_USER = os.getenv('DB_USER', 'postgres.sqgghadcjrpfwttyfegi')
+DB_PASSWORD = os.getenv('DB_PASSWORD', 'adminsepass@PP8')
+DB_HOST = os.getenv('DB_HOST', 'aws-0-ap-southeast-1.pooler.supabase.com')
+DB_PORT = os.getenv('DB_PORT', '6543')
+DB_NAME = os.getenv('DB_NAME', 'postgres')
 
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': db_name,
-            'USER': db_user,
-            'PASSWORD': db_password,
-            'HOST': db_host,
-            'PORT': db_port,
-            'OPTIONS': {
-                'sslmode': 'require',
-                # This 'options' part is the "Secret Sauce" for Supabase Poolers
-                'options': f"-c endpoint=sqgghadcjrpfwttyfegi"
-            },
-            'CONN_MAX_AGE': 0,
-        }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': DB_NAME,
+        'USER': DB_USER,
+        'PASSWORD': DB_PASSWORD,
+        'HOST': DB_HOST,
+        'PORT': DB_PORT,
+        'OPTIONS': {
+            'sslmode': 'require',
+            # Critical routing option for Supabase Pooler
+            'options': f"-c endpoint=sqgghadcjrpfwttyfegi"
+        },
+        'CONN_MAX_AGE': 0,
     }
-else:
-    DATABASES = {
-        'default': dj_database_url.config(
-            default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-            conn_max_age=0,
-            conn_health_checks=True,
-        )
-    }
+}
 
-# Force the standard PostgreSQL engine to avoid OS-level GIS library errors on Render
-if 'postgresql' in DATABASES['default'].get('ENGINE', '') or 'postgis' in DATABASES['default'].get('ENGINE', ''):
-    DATABASES['default']['ENGINE'] = 'django.db.backends.postgresql'
+# Fallback to SQLite only for LOCAL development if not on Render
+if not os.getenv('RENDER') and not os.getenv('DB_HOST'):
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 
 # Debugging (Masked)
-print(f"DEBUG: Connecting to {DATABASES['default'].get('HOST')} as {DATABASES['default'].get('USER')} on port {DATABASES['default'].get('PORT')}")
+print(f"DEBUG: Connecting to {DATABASES['default'].get('HOST')} as {DATABASES['default'].get('USER')}")
 
 # ---------------------------------------------------------------------------
 # Django REST Framework
