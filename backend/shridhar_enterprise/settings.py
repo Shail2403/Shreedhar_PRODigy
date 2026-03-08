@@ -99,13 +99,12 @@ DATABASES = {
     'default': {
         'ENGINE': os.getenv('DB_ENGINE', 'django.contrib.gis.db.backends.postgis'),
         'NAME': os.getenv('DB_NAME', 'postgres'),
-        'USER': os.getenv('DB_USER', 'postgres'),
+        'USER': os.getenv('DB_USER', 'postgres.sqgghadcjrpfwttyfegi'),
         'PASSWORD': os.getenv('DB_PASSWORD', 'adminsepass@PP8'),
-        'HOST': os.getenv('DB_HOST', 'db.sqgghadcjrpfwttyfegi.supabase.co'),
-        'PORT': os.getenv('DB_PORT', '5432'),
+        'HOST': os.getenv('DB_HOST', 'aws-0-ap-southeast-1.pooler.supabase.com'),
+        'PORT': os.getenv('DB_PORT', '6543'),
         'OPTIONS': {
             'sslmode': 'require',
-            'options': '-c search_path="$user",public,gis,extensions'
         },
     }
 }
