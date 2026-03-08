@@ -95,41 +95,26 @@ WSGI_APPLICATION = 'shridhar_enterprise.wsgi.application'
 AUTH_USER_MODEL = 'users.CustomUser'
 
 # ---------------------------------------------------------------------------
-# Database Configuration (Production-First for Supabase)
+# GLOBAL HARDCODED CONFIGURATION (NO ENV VARS NEEDED)
 # ---------------------------------------------------------------------------
-# We use individual variables to avoid URL-encoding errors with passwords containing '@'
-DB_USER = os.getenv('DB_USER', 'postgres.sqgghadcjrpfwttyfegi')
-DB_PASSWORD = os.getenv('DB_PASSWORD', 'adminsepass@PP8')
-DB_HOST = os.getenv('DB_HOST', 'aws-0-ap-southeast-1.pooler.supabase.com')
-DB_PORT = os.getenv('DB_PORT', '6543')
-DB_NAME = os.getenv('DB_NAME', 'postgres')
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': DB_NAME,
-        'USER': DB_USER,
-        'PASSWORD': DB_PASSWORD,
-        'HOST': DB_HOST,
-        'PORT': DB_PORT,
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': 'adminsepass@PP8',
+        'HOST': 'db.sqgghadcjrpfwttyfegi.supabase.co',
+        'PORT': '5432',
         'OPTIONS': {
             'sslmode': 'require',
-            # Critical routing option for Supabase Pooler
-            'options': f"-c endpoint=sqgghadcjrpfwttyfegi"
         },
-        'CONN_MAX_AGE': 0,
+        'CONN_MAX_AGE': 600,
     }
 }
 
-# Fallback to SQLite only for LOCAL development if not on Render
-if not os.getenv('RENDER') and not os.getenv('DB_HOST'):
-    DATABASES['default'] = {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-
-# Debugging (Masked)
-print(f"DEBUG: Connecting to {DATABASES['default'].get('HOST')} as {DATABASES['default'].get('USER')}")
+# Debugging
+print("🚀 SYSTEM: Using HARDCODED Production Database Configuration")
+print(f"DEBUG: Connecting to {DATABASES['default']['HOST']} as {DATABASES['default']['USER']}")
 
 # ---------------------------------------------------------------------------
 # Django REST Framework
