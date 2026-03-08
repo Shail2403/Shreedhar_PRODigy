@@ -1,0 +1,101 @@
+{% autoescape off %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Your Email - Shridhar Enterprise</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #c62828 0%, #b71c1c 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .content {
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 15px 35px;
+            background-color: #c62828;
+            color: white !important;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 30px 0;
+        }
+
+        .footer {
+            background: #f9f9f9;
+            padding: 20px;
+            text-align: center;
+            font-size: 0.85rem;
+            color: #888;
+            border-top: 1px solid #eee;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 900;
+        }
+
+        p {
+            margin: 15px 0;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>शridhar Enterprise</h1>
+            <p>Quality Snacks, Delivered Fresh</p>
+        </div>
+        <div class="content">
+            <h2>Welcome to Shridhar Enterprise!</h2>
+            <p>Hi {{ user.full_name }},</p>
+            <p>Thank you for signing up with us. To complete your registration and start ordering your favorite snacks,
+                please verify your email address by clicking the button below:</p>
+
+            <a href="{{ verification_url }}" class="button">Verify Email Now</a>
+
+            <p style="font-size: 0.9rem; color: #888;">If the button above doesn't work, copy and paste this link into
+                your browser:</p>
+            <p style="font-size: 0.8rem; word-break: break-all; color: #c62828;">{{ verification_url }}</p>
+        </div>
+        <div class="footer">
+            <p>&copy; 2026 Shridhar Enterprise Pvt Ltd. All rights reserved.</p>
+            <p>Chamunda Nagar, Ahmedabad, Gujarat</p>
+        </div>
+    </div>
+</body>
+
+</html>
+{% endautoescape %}

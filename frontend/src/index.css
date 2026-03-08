@@ -1,0 +1,360 @@
+:root {
+  --primary: #c62828;
+  --primary-light: #ef5350;
+  --secondary: #1a1a1a;
+  --accent: #ff9800;
+  --success: #2e7d32;
+  --text-main: #111;
+  --text-muted: #666;
+  --bg-main: #fcfcfc;
+  --bg-card: #ffffff;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.12);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* Typography */
+h1,
+h2,
+h3,
+h4 {
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Components */
+.glass {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: var(--shadow-md);
+}
+
+.zepto-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid #f0f0f0;
+}
+
+.zepto-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: rgba(198, 40, 40, 0.1);
+}
+
+.zepto-btn-add {
+  background: white;
+  color: var(--primary);
+  border: 1.5px solid var(--primary);
+  font-weight: 800;
+  transition: all 0.2s;
+}
+
+.zepto-btn-add:hover {
+  background: var(--primary);
+  color: white;
+}
+
+/* Grids */
+.grid-products {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Animations & Utility */
+.checkout-grid {
+  display: flex;
+  flex-direction: column-reverse; /* Puts order summary first on mobile */
+  gap: 2rem;
+  align-items: stretch;
+}
+
+@media (min-width: 1024px) {
+  .checkout-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+  }
+
+  .checkout-sidebar-sticky {
+    position: sticky;
+    top: 90px;
+  }
+}
+
+.active-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.active-scroll {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 1rem;
+  }
+
+  .grid-products {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .hero-banner {
+    padding: 2.5rem 1.5rem !important;
+  }
+
+  .hidden-mobile {
+    display: none !important;
+  }
+
+  .cart-text-desktop {
+    display: none !important;
+  }
+}
+
+/* Animation Classes */
+.animate-pop {
+  animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.animate-scale {
+  animation: scaleIn 0.3s ease-out forwards;
+}
+
+.animate-fade {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.5s ease-out forwards;
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
+
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Visibility Utilities */
+.visible-mobile {
+  display: none !important;
+}
+
+.hidden-mobile {
+  display: block !important;
+}
+
+@media (max-width: 768px) {
+  .visible-mobile {
+    display: flex !important;
+  }
+
+  .hidden-mobile {
+    display: none !important;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.loader {
+  width: 48px;
+  height: 48px;
+  border: 5px solid #FFF;
+  border-bottom-color: var(--primary);
+  border-radius: 50%;
+  display: inline-block;
+  animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Zepto / Amazon Style Qty Controls */
+.qty-controls-mobile {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--primary);
+  color: white;
+  border-radius: 8px;
+  padding: 4px;
+  box-shadow: 0 4px 10px rgba(198, 40, 40, 0.2);
+  width: 80px;
+}
+
+.qty-btn-mobile {
+  background: transparent;
+  border: none;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.qty-btn-mobile:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.qty-btn-mobile:active {
+  transform: scale(0.9);
+}
+
+.zepto-btn-add {
+  background: white;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+  font-weight: 800;
+  border-radius: 8px;
+  transition: all 0.2s;
+  box-shadow: 0 2px 6px rgba(198, 40, 40, 0.1);
+}
+
+.zepto-btn-add:hover {
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 4px 12px rgba(198, 40, 40, 0.2);
+}
+
+.zepto-btn-add:active {
+  transform: scale(0.95);
+}
+
+/* Enhanced Cart Drawer Items */
+.cart-item-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid #f0f0f0;
+  padding: 12px;
+}
+
+.cart-item-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+}
+
+.cart-qty-selector {
+  display: flex;
+  align-items: center;
+  background: var(--primary);
+  border-radius: 6px;
+  overflow: hidden;
+  color: white;
+}
+
+.cart-qty-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.cart-qty-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.cart-qty-val {
+  font-weight: 600;
+  padding: 0 8px;
+  font-size: 0.9rem;
+}
