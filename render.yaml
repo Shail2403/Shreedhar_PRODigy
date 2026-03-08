@@ -29,6 +29,24 @@ services:
         value: db.sqgghadcjrpfwttyfegi.supabase.co
       - key: DB_PORT
         value: "5432"
+      # Email
+      - key: EMAIL_HOST
+        value: smtp.gmail.com
+      - key: EMAIL_PORT
+        value: "587"
+      - key: EMAIL_HOST_USER
+        value: gcp.shridharenterprise@gmail.com
+      - key: EMAIL_HOST_PASSWORD
+        fromContext: secret
+      # External APIs
+      - key: GCP_MAPS_PLATFORM_API
+        value: AIzaSyBcwLjSEIpuh5mZfdoI8pqTRSc5Ztyfi1Q
+      - key: PAYPAL_CLIENT_ID
+        value: AQBH1f4jL1K6_fKo0LzYrShqc4Bll13L4JcS_Um39rXtIBM0SLUSVj7vU_4l2ECmp87uzOlfMQnrtqzu
+      - key: PAYPAL_MODE
+        value: sandbox
+      - key: FRONTEND_URL
+        value: https://shridhar-frontend.onrender.com
 
   # Frontend
   - type: static
