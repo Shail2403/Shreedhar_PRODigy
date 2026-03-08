@@ -149,13 +149,14 @@ def create_order_view(request):
     # ── Create Order Items (price snapshot) ──────────────────────────────────
     for item in cart.items.select_related('product').all():
         product = item.product
-        # Get primary image URL
-        primary_img = product.images.filter(sort_order=0).first()
+        # Get primary image URL safely
         img_url = ''
-        if primary_img and primary_img.image:
-            img_url = request.build_absolute_uri(primary_img.image.url)
-        elif product.primary_image:
-             img_url = product.primary_image # already absolute or handled by serializer logic usually
+        try:
+            primary_img = product.images.filter(sort_order=0).first()
+            if primary_img and primary_img.image:
+                img_url = request.build_absolute_uri(primary_img.image.url)
+        except Exception:
+            img_url = ''
 
         OrderItem.objects.create(
             order=order,
@@ -172,9 +173,15 @@ def create_order_view(request):
     # ── Clear cart ───────────────────────────────────────────────────────────
     cart.items.all().delete()
 
-    # ── Notifications ────────────────────────────────────────────────────────
-    EmailService.send_order_confirmation(user, order)
-    SMSService.send_order_sms(str(user.phone), order.order_number, 'Confirmed')
+    # ── Notifications (non-blocking) ─────────────────────────────────────────
+    try:
+        EmailService.send_order_confirmation(user, order)
+    except Exception as e:
+        print(f"Email notification failed (non-critical): {e}")
+    try:
+        SMSService.send_order_sms(str(user.phone), order.order_number, 'Confirmed')
+    except Exception as e:
+        print(f"SMS notification failed (non-critical): {e}")
 
     # ── PayPal: mark intention for paypal ─────────────
     paypal_order_id = None
