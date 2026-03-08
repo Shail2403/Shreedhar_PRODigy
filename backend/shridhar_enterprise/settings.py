@@ -95,39 +95,31 @@ WSGI_APPLICATION = 'shridhar_enterprise.wsgi.application'
 AUTH_USER_MODEL = 'users.CustomUser'
 
 # Robust Database Configuration for Supabase Pooler
+# Priority: Individual Env Vars > DATABASE_URL > Default
 database_url = os.getenv('DATABASE_URL')
-if database_url:
-    # Use manual parsing to ensure the project ref and encoded password are handled correctly
-    url = urllib.parse.urlparse(database_url)
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': url.path[1:] or os.getenv('DB_NAME', 'postgres'),
-            'USER': url.username or os.getenv('DB_USER'),
-            'PASSWORD': urllib.parse.unquote(url.password) if url.password else os.getenv('DB_PASSWORD'),
-            'HOST': url.hostname or os.getenv('DB_HOST'),
-            'PORT': url.port or os.getenv('DB_PORT', 6543),
-            'OPTIONS': {
-                'sslmode': 'require',
-            },
-            'CONN_MAX_AGE': 0, # Required for Supabase Transaction mode
-        }
+url = urllib.parse.urlparse(database_url) if database_url else None
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME') or (url.path[1:] if url else 'postgres'),
+        'USER': os.getenv('DB_USER') or (url.username if url else 'postgres'),
+        'PASSWORD': os.getenv('DB_PASSWORD') or (urllib.parse.unquote(url.password) if url and url.password else 'adminsepass@PP8'),
+        'HOST': os.getenv('DB_HOST') or (url.hostname if url else 'aws-0-ap-southeast-1.pooler.supabase.com'),
+        'PORT': int(os.getenv('DB_PORT') or (url.port if url else 5432)),
+        'OPTIONS': {
+            'sslmode': 'require',
+        },
+        'CONN_MAX_AGE': 0,
     }
-else:
-    DATABASES = {
-        'default': dj_database_url.config(
-            default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-            conn_max_age=0,
-            conn_health_checks=True,
-        )
-    }
+}
 
 # Force the standard PostgreSQL engine to avoid OS-level GIS library errors on Render
 if 'postgresql' in DATABASES['default'].get('ENGINE', '') or 'postgis' in DATABASES['default'].get('ENGINE', ''):
     DATABASES['default']['ENGINE'] = 'django.db.backends.postgresql'
 
 # Debugging (Masked)
-print(f"DEBUG: Connecting to {DATABASES['default'].get('HOST')} as {DATABASES['default'].get('USER')}")
+print(f"DEBUG: Connecting to {DATABASES['default'].get('HOST')} as {DATABASES['default'].get('USER')} on port {DATABASES['default'].get('PORT')}")
 
 # ---------------------------------------------------------------------------
 # Django REST Framework
@@ -218,7 +210,9 @@ USE_TZ = True
 # ---------------------------------------------------------------------------
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [BASE_DIR / 'static']
+STATICFILES_DIRS = []  # Clear to avoid warning, or add existing folders
+if (BASE_DIR / 'static').exists():
+    STATICFILES_DIRS.append(BASE_DIR / 'static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
