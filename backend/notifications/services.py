@@ -136,12 +136,16 @@ class EmailService:
         if not email:
             logger.warning(f"[EMAIL] No verified email for user {user.id}. Order confirmation skipped.")
             return False
-        html_content = render_to_string('emails/order_confirmation.html', {
-            'user': user,
-            'order': order,
-            'domain': settings.FRONTEND_URL.replace('http://', '').replace('https://', ''),
-            'shop_name': 'Shridhar Enterprise Pvt Ltd',
-        })
+        try:
+            html_content = render_to_string('emails/order_confirmation.html', {
+                'user': user,
+                'order': order,
+                'domain': settings.FRONTEND_URL.replace('http://', '').replace('https://', ''),
+                'shop_name': 'Shridhar Enterprise Pvt Ltd',
+            })
+        except Exception as e:
+            logger.error(f"[EMAIL] Template render failed, using fallback: {e}")
+            html_content = f"<p>Dear {user.display_name},</p><p>Your order <b>#{order.order_number}</b> has been confirmed. Total: ₹{order.total_amount}</p><p>Thank you for shopping with Shridhar Enterprise!</p>"
         return cls._send(
             subject=f'🛒 Order #{order.order_number} Confirmed – Shridhar Enterprise',
             recipient=email,
