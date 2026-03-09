@@ -14,9 +14,13 @@ const ProductCard = ({ product }) => {
     const cartItem = cart?.items?.find(item => item.product?.id === product.id);
     const quantity = cartItem ? cartItem.quantity : 0;
 
+    const inStock = product.stock > 0;
+
     const handleAdd = async (e) => {
         e.preventDefault();
         e.stopPropagation();
+
+        if (!inStock) return;
 
         if (!isAuthenticated) {
             navigate('/login');
@@ -38,7 +42,7 @@ const ProductCard = ({ product }) => {
     const handleUpdate = (e, newQty) => {
         e.preventDefault();
         e.stopPropagation();
-        if (cartItem) {
+        if (cartItem && inStock) {
             updateItem(cartItem.id, newQty);
         }
     };
@@ -51,19 +55,33 @@ const ProductCard = ({ product }) => {
             height: '100%',
             cursor: 'default',
             position: 'relative',
+            opacity: inStock ? 1 : 0.6,
+            filter: inStock ? 'none' : 'grayscale(0.8)',
+            pointerEvents: inStock ? 'auto' : 'none'
         }}>
 
-            <Link to={`/product/${product.slug}`} style={{ flex: 1, textDecoration: 'none', color: 'inherit' }}>
+            <Link to={inStock ? `/product/${product.slug}` : '#'} style={{ flex: 1, textDecoration: 'none', color: 'inherit', cursor: inStock ? 'pointer' : 'default' }}>
                 <div style={{ position: 'relative', marginBottom: '1.25rem', overflow: 'hidden', borderRadius: 'var(--radius-sm)' }}>
                     <img
                         src={product.primary_image || 'https://via.placeholder.com/400?text=Product'}
                         alt={product.name}
                         loading="lazy"
                         style={{ width: '100%', aspectRatio: '1/1', objectFit: 'cover', transition: 'transform 0.5s' }}
-                        onMouseOver={e => e.currentTarget.style.transform = 'scale(1.05)'}
-                        onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}
+                        onMouseOver={e => inStock && (e.currentTarget.style.transform = 'scale(1.05)')}
+                        onMouseOut={e => inStock && (e.currentTarget.style.transform = 'scale(1)')}
                     />
-                    {product.discount_percent > 0 && (
+                    {!inStock && (
+                        <div style={{
+                            position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+                            background: 'rgba(255,255,255,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                        }}>
+                            <span style={{
+                                background: '#333', color: 'white', padding: '0.4rem 0.8rem',
+                                borderRadius: '4px', fontWeight: 800, fontSize: '0.75rem', letterSpacing: '0.5px'
+                            }}>OUT OF STOCK</span>
+                        </div>
+                    )}
+                    {product.discount_percent > 0 && inStock && (
                         <div style={{
                             position: 'absolute', top: '10px', left: '10px',
                             background: 'var(--primary)', color: 'white',
@@ -90,7 +108,7 @@ const ProductCard = ({ product }) => {
                 <p style={{ fontSize: '0.85rem', color: '#666', marginBottom: '1rem' }}>{product.weight}</p>
             </Link>
 
-            <div className="flex items-center justify-between" style={{ marginTop: 'auto', paddingTop: '0.5rem' }}>
+            <div className="flex items-center justify-between" style={{ marginTop: 'auto', paddingTop: '0.5rem', pointerEvents: 'auto' }}>
                 <div className="flex flex-col">
                     <span style={{ fontWeight: 900, fontSize: '1.15rem', color: '#111' }}>₹{product.selling_price}</span>
                     {product.mrp > product.selling_price && (
@@ -98,7 +116,15 @@ const ProductCard = ({ product }) => {
                     )}
                 </div>
 
-                {quantity > 0 ? (
+                {!inStock ? (
+                    <button
+                        disabled
+                        className="zepto-btn-add"
+                        style={{ padding: '0.5rem 0.75rem', fontSize: '0.75rem', background: '#eee', color: '#999', border: '1px solid #ddd', cursor: 'not-allowed' }}
+                    >
+                        OUT
+                    </button>
+                ) : quantity > 0 ? (
                     <div className="qty-controls-mobile animate-pop">
                         <button className="qty-btn-mobile" onClick={(e) => handleUpdate(e, quantity - 1)}><Minus size={14} /></button>
                         <span style={{ minWidth: '20px', textAlign: 'center', fontWeight: 800, fontSize: '0.9rem' }}>{quantity}</span>

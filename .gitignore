@@ -26,7 +26,6 @@ sec_prod_venv/
 local_settings.py
 db.sqlite3
 staticfiles/
-static/
 backend.log
 frontend.log
 

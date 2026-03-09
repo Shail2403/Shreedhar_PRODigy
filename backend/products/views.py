@@ -74,7 +74,7 @@ class ProductListView(generics.ListAPIView):
         # Availability filter
         availability = self.request.query_params.get('availability', 'all')
         if availability == 'in_stock':
-            qs = qs.filter(is_available=True, stock_quantity__gt=0)
+            qs = qs.filter(is_available=True, stock__gt=0)
         elif availability == 'all':
             # Default to active products only for guest/listing
             qs = qs.filter(is_available=True)
@@ -105,15 +105,29 @@ class ProductListView(generics.ListAPIView):
         if self.request.query_params.get('bestseller') == 'true':
             qs = qs.filter(is_bestseller=True)
 
-        # Ordering
-        sort = self.request.query_params.get('sort')
-        if sort == 'price_low':
-            qs = qs.order_by('selling_price')
-        elif sort == 'price_high':
-            qs = qs.order_by('-selling_price')
-        elif sort == 'newest':
-            qs = qs.order_by('-created_at')
+        # ── Ordering ──
+        # Check for 'ordering' (DRF default) or 'sort' (custom)
+        order_param = self.request.query_params.get('ordering') or self.request.query_params.get('sort')
+        
+        # Map common frontend names to actual fields
+        sort_map = {
+            'price_low': 'selling_price',
+            'price_high': '-selling_price',
+            'newest': '-created_at',
+            'discount': '-discount_percent',
+            'rating': '-rating',
+            'relevance': 'sort_order'
+        }
+        
+        final_ordering = sort_map.get(order_param, order_param)
+        
+        if final_ordering:
+            # Handle list if ordering is provided as comma-separated string
+            if isinstance(final_ordering, str):
+                order_list = [o.strip() for o in final_ordering.split(',') if o.strip()]
+                qs = qs.order_by(*order_list)
         else:
+            # Default fallback
             qs = qs.order_by('sort_order', '-created_at')
 
         return qs

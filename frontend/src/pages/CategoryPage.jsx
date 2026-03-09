@@ -10,6 +10,7 @@ const CategoryPage = () => {
     const [loading, setLoading] = useState(true);
     const [ordering, setOrdering] = useState('sort_order');
     const [brandFilter, setBrandFilter] = useState('');
+    const [availability, setAvailability] = useState('all'); // 'all' or 'in_stock'
     const [brands, setBrands] = useState([]);
 
     useEffect(() => {
@@ -27,7 +28,8 @@ const CategoryPage = () => {
             setLoading(true);
             try {
                 let url = slug === 'all' ? '/products/' : `/products/?category=${slug}`;
-                url += `${url.includes('?') ? '&' : '?'}ordering=${ordering}`;
+                const connector = url.includes('?') ? '&' : '?';
+                url += `${connector}ordering=${ordering}&availability=${availability}`;
                 if (brandFilter) url += `&brand=${brandFilter}`;
 
                 const response = await api.get(url);
@@ -39,7 +41,7 @@ const CategoryPage = () => {
             }
         };
         fetchCategoryProducts();
-    }, [slug, ordering, brandFilter]);
+    }, [slug, ordering, brandFilter, availability]);
 
     if (loading && !data) return (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '60vh' }}>
@@ -69,7 +71,18 @@ const CategoryPage = () => {
                         <p style={{ color: '#666', marginTop: '0.25rem' }}>Showing {data?.results?.length || 0} premium items</p>
                     </div>
 
-                    <div className="flex gap-3" style={{ flexWrap: 'wrap' }}>
+                    <div className="flex gap-4 items-center" style={{ flexWrap: 'wrap' }}>
+                        {/* In Stock Toggle */}
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', background: 'white', padding: '0.65rem 1rem', border: '1px solid #ddd', borderRadius: 'var(--radius-sm)', fontSize: '0.9rem', fontWeight: 600 }}>
+                            <input
+                                type="checkbox"
+                                checked={availability === 'in_stock'}
+                                onChange={e => setAvailability(e.target.checked ? 'in_stock' : 'all')}
+                                style={{ accentColor: 'var(--primary)', width: '16px', height: '16px' }}
+                            />
+                            Hide Out of Stock
+                        </label>
+
                         {/* Brand Filter */}
                         <div style={{ position: 'relative' }}>
                             <select
@@ -100,12 +113,12 @@ const CategoryPage = () => {
                                     minWidth: '180px'
                                 }}
                             >
-                                <option value="sort_order">Relevance</option>
-                                <option value="selling_price">Price: Low to High</option>
-                                <option value="-selling_price">Price: High to Low</option>
-                                <option value="-rating">Rating: High to Low</option>
-                                <option value="-discount_percent">Biggest Discount</option>
-                                <option value="-created_at">Newest First</option>
+                                <option value="relevance">Relevance</option>
+                                <option value="price_low">Price: Low to High</option>
+                                <option value="price_high">Price: High to Low</option>
+                                <option value="rating">Rating: High to Low</option>
+                                <option value="discount">Biggest Discount</option>
+                                <option value="newest">Newest First</option>
                             </select>
                             <ArrowUpDown size={14} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#888' }} />
                         </div>
