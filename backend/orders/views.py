@@ -173,14 +173,14 @@ def create_order_view(request):
     # ── Clear cart ───────────────────────────────────────────────────────────
     cart.items.all().delete()
 
-    # ── Notifications (non-blocking) ─────────────────────────────────────────
+    # ── Notifications (non-blocking — MUST NOT crash the order) ────────────
     try:
         EmailService.send_order_confirmation(user, order)
-    except Exception as e:
+    except BaseException as e:
         print(f"Email notification failed (non-critical): {e}")
     try:
         SMSService.send_order_sms(str(user.phone), order.order_number, 'Confirmed')
-    except Exception as e:
+    except BaseException as e:
         print(f"SMS notification failed (non-critical): {e}")
 
     # ── PayPal: mark intention for paypal ─────────────

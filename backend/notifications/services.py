@@ -94,6 +94,7 @@ class EmailService:
         """
         Core send utility. Uses multipart/alternative for HTML + plain text fallback.
         Returns True on success, False on error (logged).
+        IMPORTANT: fail_silently=True so SMTP timeouts never crash the server.
         """
         try:
             plain_text = strip_tags(html_content)
@@ -104,10 +105,10 @@ class EmailService:
                 to=[recipient],
             )
             msg.attach_alternative(html_content, "text/html")
-            msg.send(fail_silently=False)
+            msg.send(fail_silently=True)  # CRITICAL: must be True to prevent gunicorn worker crash
             logger.info(f"[EMAIL] Sent '{subject}' to {recipient}")
             return True
-        except Exception as exc:
+        except BaseException as exc:  # BaseException catches SystemExit too
             logger.error(f"[EMAIL] Failed to send '{subject}' to {recipient}: {exc}")
             return False
 
