@@ -25,7 +25,6 @@ sec_prod_venv/
 # Django
 local_settings.py
 db.sqlite3
-media/
 staticfiles/
 static/
 backend.log

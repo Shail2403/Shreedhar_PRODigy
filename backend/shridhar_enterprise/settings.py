@@ -216,8 +216,9 @@ STATICFILES_DIRS = []  # Clear to avoid warning, or add existing folders
 if (BASE_DIR / 'static').exists():
     STATICFILES_DIRS.append(BASE_DIR / 'static')
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+# MEDIA pointed into STATIC so committed images are served by WhiteNoise on Render
+MEDIA_URL = '/static/media/'
+MEDIA_ROOT = BASE_DIR / 'static' / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
