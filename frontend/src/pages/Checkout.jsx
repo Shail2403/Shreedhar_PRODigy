@@ -68,6 +68,11 @@ const Checkout = () => {
 
     useEffect(() => { fetchAddresses(); }, []);
 
+    // Scroll to top on step change
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [step]);
+
     const handleAddressSelect = async (addr) => {
         setSelectedAddress(addr);
         if (addr.latitude && addr.longitude) {
