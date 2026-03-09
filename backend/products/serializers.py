@@ -5,8 +5,28 @@ Serializers for product catalog API endpoints.
 Provides full Zepto-parity data including pricing, discounts, ratings, images.
 """
 
+from django.conf import settings
 from rest_framework import serializers
 from .models import Category, Brand, Product, ProductImage
+
+
+# Production backend base URL – used when request context is not available
+BACKEND_BASE_URL = 'https://shreedhar-prodigy.onrender.com'
+
+
+def build_image_url(request, image_field):
+    """
+    Build an absolute HTTPS URL for a media image field.
+    Uses request.build_absolute_uri() when available (correctly picks up
+    X-Forwarded-Proto: https on Render). Falls back to hardcoded production
+    base URL so images never return http://127.0.0.1:10000/... URLs.
+    """
+    if not image_field:
+        return None
+    relative_url = image_field.url
+    if request:
+        return request.build_absolute_uri(relative_url)
+    return f"{BACKEND_BASE_URL}{relative_url}"
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -24,7 +44,7 @@ class CategorySerializer(serializers.ModelSerializer):
         if p:
             image = p.images.filter(sort_order=0).first()
             if image and image.image:
-                return request.build_absolute_uri(image.image.url) if request else image.image.url
+                return build_image_url(request, image.image)
         return None
 
 
@@ -72,7 +92,7 @@ class ProductListSerializer(serializers.ModelSerializer):
         image = obj.images.filter(sort_order=0).first()
         if image and image.image:
             request = self.context.get('request')
-            return request.build_absolute_uri(image.image.url) if request else image.image.url
+            return build_image_url(request, image.image)
         return None
 
 

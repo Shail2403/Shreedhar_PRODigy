@@ -20,9 +20,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent  # backend/ root
 # ---------------------------------------------------------------------------
 # Security
 # ---------------------------------------------------------------------------
-SECRET_KEY = os.getenv('SECRET_KEY', config('SECRET_KEY', default='shridhar-enterprise-super-secret-key-change-in-production-2024!'))
+SECRET_KEY = os.getenv('SECRET_KEY', 'shridhar-enterprise-super-secret-key-change-in-production-2024!')
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
+ALLOWED_HOSTS = ['*']
+
+# ---------------------------------------------------------------------------
+# Production HTTPS / Proxy settings (Render reverse proxy)
+# ---------------------------------------------------------------------------
+# Tell Django it's behind Render's HTTPS proxy so it builds correct https:// URLs
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
 
 # ---------------------------------------------------------------------------
 # Application definition
